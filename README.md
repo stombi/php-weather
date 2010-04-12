@@ -24,7 +24,9 @@ Cache is enabled by default, with an expiry of 60 minutes. You can alter this be
     
 The complete parameter list of the Weather class constructor is:
 
-    new Weather(bool $metric, [int $cache, [string $cache_dir]]);
+    new Weather(bool $metric, [int $cache_minutes, [string $cache_dir]]);
+    
+Find your zip or area code on www.weather.com!
     
 Output
 ------

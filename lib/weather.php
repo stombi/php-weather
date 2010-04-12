@@ -24,10 +24,10 @@ class Weather
         'steady', 'rising', 'falling'
     );
     
-    public function __construct($metric = true, $cache = 60, $cache_path = 'cache/')
+    public function __construct($metric = true, $cache_minutes = 60, $cache_path = 'cache/')
     {
         $this->metric = $metric;
-        $this->cache = $cache;
+        $this->cache_minutes = $cache_minutes;
         $this->cache_path = $cache_path;
     }
     
@@ -172,7 +172,7 @@ class Weather
         $weather_xml = '';
         $file_path = strtolower($this->cache_path . 'weather_' . $zip . '.xml');
         
-        if ($this->cache && file_exists($file_path) && ((filemtime($file_path) + ($this->cache * 60)) > time()))
+        if ($this->cache_minutes && file_exists($file_path) && ((filemtime($file_path) + ($this->cache_minutes * 60)) > time()))
         {
             $weather_xml = file_get_contents($file_path);
         }
