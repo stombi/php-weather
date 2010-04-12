@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Weather
+ * 
+ * PHP 5 wrapper for Yahoo! weather.
+ * 
+ * @author Christopher Pitt
+ */
 class Weather
 {
     const METRIC = 0;
@@ -24,6 +31,13 @@ class Weather
         'steady', 'rising', 'falling'
     );
     
+    /**
+     * Weather::__construct()
+     * 
+     * @param bool $metric Metric units of measurement must be used.
+     * @param integer $cache_minutes Duration for which the weather data must be cached.
+     * @param string $cache_path Folder in which to place the cache files (needs read/write permissions).
+     */
     public function __construct($metric = true, $cache_minutes = 60, $cache_path = 'cache/')
     {
         $this->metric = $metric;
@@ -31,6 +45,14 @@ class Weather
         $this->cache_path = $cache_path;
     }
     
+    /**
+     * Weather::get()
+     * 
+     * This method will return weather data for a specified area.
+     * 
+     * @param mixed $zip US zip code or area code (weather.com).
+     * @return array Weather data for requested area.
+     */
     public function get($zip)
     {        
         $xml = new DOMDocument();
@@ -140,6 +162,16 @@ class Weather
         );
     }
     
+    /**
+     * Weather::convert()
+     * 
+     * This method can be used for limited conversion between imperial and metric systems.
+     * 
+     * @param mixed $value Value to be converted.
+     * @param mixed $type Type of conversion to take place (TEMPERATURE/PRESSURE/DISTANCE).
+     * @param mixed $from System to convert from (METRIC/IMPERIAL).
+     * @return string Converted (and formatted) value.
+     */
     public function convert($value, $type = TEMPERATURE, $from = IMPERIAL)
     {        
         switch ($type)
@@ -167,6 +199,14 @@ class Weather
         }
     }
     
+    /**
+     * Weather::get_xml()
+     * 
+     * This method gets the xml data for the specified area.
+     * 
+     * @param mixed $zip US zip code or area code (weather.com).
+     * @return string Yahoo! XML data.
+     */
     protected function get_xml($zip)
     {
         $weather_xml = '';
@@ -185,6 +225,14 @@ class Weather
         return $weather_xml;
     }
     
+    /**
+     * Weather::get_url()
+     * 
+     * This method issues a cURL request to a specified URL.
+     * 
+     * @param mixed $url URL to fetch using cURL.
+     * @return string Response text.
+     */
     protected function get_url($url)
     {
     	$curl = curl_init($url);
