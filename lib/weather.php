@@ -12,6 +12,9 @@ class Weather
     const METRIC = 0;
     const IMPERIAL = 1;
     
+    const JSON = 0;
+    const SERIALIZED = 1;
+    
     const TEMPERATURE = 0;
     const DISTANCE = 1;
     const PRESSURE = 2;
@@ -37,26 +40,93 @@ class Weather
      * @param bool $metric Metric units of measurement must be used.
      * @param integer $cache_minutes Duration for which the weather data must be cached.
      * @param string $cache_path Folder in which to place the cache files (needs read/write permissions).
+     * @param int $cache_format Format in which the cached data will be saved (JSON/SERIALIZED).
      */
-    public function __construct($metric = true, $cache_minutes = 60, $cache_path = 'cache/')
+    public function __construct($metric = true, $cache_minutes = 60, $cache_path = 'cache/', $cache_format = JSON)
     {
         $this->metric = $metric;
         $this->cache_minutes = $cache_minutes;
         $this->cache_path = $cache_path;
+        $this->cache_format = $cache_format;
     }
     
     /**
      * Weather::get()
      * 
-     * This method will return weather data for a specified area.
+     * This method will return the weather data for the specified area.
      * 
      * @param mixed $zip US zip code or area code (weather.com).
      * @return array Weather data for requested area.
      */
     public function get($zip)
+    {
+        $prefix = 'weather_';
+        $system = $this->metric ? 'metric_' : 'imperial_';
+        $format = ($this->cache_format == JSON) ? '.json' : '.serialized';
+        
+        $weather_data;
+        $file_path = strtolower($this->cache_path . $prefix . $system . $zip . $format);
+        if ($this->cache_minutes && file_exists($file_path) && ((filemtime($file_path) + ($this->cache_minutes * 60)) > time()))
+        {
+            if ($this->cache_format == JSON)
+            {
+                $weather_data = json_decode(file_get_contents($file_path));
+            }
+            else
+            {
+                $weather_data = unserialize(file_get_contents($file_path));
+            }
+        }
+        else
+        {
+            $weather_data = $this->process($zip);
+            
+            if ($this->cache_format == JSON)
+            {
+                file_put_contents($file_path, json_encode($weather_data));
+            }
+            else
+            {
+                file_put_contents($file_path, serialize($weather_data));
+            }
+        }
+        
+        return $this->objects($weather_data);
+    }
+    
+    /**
+     * Weather::__construct()
+     * 
+     * @param mixed $object Object to walk and convert from array to object.
+     * @param mixed Either an object converted from an array, or the original value.
+     */
+    protected function objects($object)
+    {
+        if (is_array($object))
+        {
+            foreach ($object as $key => $value)
+            {
+                $object[$key] = $this->objects($value);
+            }
+            
+            return (object) $object;
+        }
+        
+        return $object;
+    }
+    
+    /**
+     * Weather::process()
+     * 
+     * This method will process the weather data of a specified area into an array.
+     * 
+     * @param mixed $zip US zip code or area code (weather.com).
+     * @return array Weather data for requested area.
+     */
+    public function process($zip)
     {        
         $xml = new DOMDocument();
-        $xml->loadXML($this->get_xml($zip));
+        $xml->loadXML($this->get_url('http://xml.weather.yahoo.com/forecastrss?p=' . $zip));
         
         $yahoo_ns = 'http://xml.weather.yahoo.com/ns/rss/1.0';
         $geo_ns = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
@@ -197,32 +267,6 @@ class Weather
                 }
                 return number_format($value * 33.8637526, 0);
         }
-    }
-    
-    /**
-     * Weather::get_xml()
-     * 
-     * This method gets the xml data for the specified area.
-     * 
-     * @param mixed $zip US zip code or area code (weather.com).
-     * @return string Yahoo! XML data.
-     */
-    protected function get_xml($zip)
-    {
-        $weather_xml = '';
-        $file_path = strtolower($this->cache_path . 'weather_' . $zip . '.xml');
-        
-        if ($this->cache_minutes && file_exists($file_path) && ((filemtime($file_path) + ($this->cache_minutes * 60)) > time()))
-        {
-            $weather_xml = file_get_contents($file_path);
-        }
-        else
-        {
-            $weather_xml = $this->get_url('http://xml.weather.yahoo.com/forecastrss?p=' . $zip);
-            file_put_contents($file_path, $weather_xml);
-        }
-        
-        return $weather_xml;
     }
     
     /**

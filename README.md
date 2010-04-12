@@ -1,7 +1,7 @@
 Weather
 =======
 
-PHP 5 wrapper for Yahoo! weather.
+PHP 5 wrapper for Yahoo! weather. Caches with JSON or normal PHP serialization.
 
 How to use
 ----------
@@ -24,24 +24,24 @@ Cache is enabled by default, with an expiry of 60 minutes. You can alter this be
     
 The complete parameter list of the Weather class constructor is:
 
-    new Weather(bool $metric, [int $cache_minutes, [string $cache_dir]]);
+    new Weather(bool $metric, [int $cache_minutes, [string $cache_dir, [int $cache_format]]);
     
 Find your zip or area code on www.weather.com!
     
 Output
 ------
 
-    Array
+    stdClass Object
     (
         [language] => en-us
-        [location] => Array
+        [location] => stdClass Object
             (
                 [city] => Cape Town
                 [region] => 
                 [country] => SF
             )
     
-        [units] => Array
+        [units] => stdClass Object
             (
                 [temperature] => C
                 [distance] => km
@@ -49,41 +49,41 @@ Output
                 [speed] => kph
             )
     
-        [wind] => Array
+        [wind] => stdClass Object
             (
-                [chill] => 24
-                [direction] => S
-                [speed] => 13
+                [chill] => 19
+                [direction] => SW
+                [speed] => 5
             )
     
-        [atmosphere] => Array
+        [atmosphere] => stdClass Object
             (
-                [humidity] => 44
+                [humidity] => 73
                 [visibility] => 10
-                [pressure] => 1,014
-                [rising] => steady
+                [pressure] => 1,015
+                [rising] => rising
             )
     
-        [astronomy] => Array
+        [astronomy] => stdClass Object
             (
                 [sunrise] => 7:05 am
                 [sunset] => 6:26 pm
             )
     
-        [condition] => Array
+        [condition] => stdClass Object
             (
                 [text] => Fair
-                [code] => 34
-                [image] => 34
-                [temp] => 24
-                [date] => Mon, 12 Apr 2010 6:00 pm SAST
+                [code] => 33
+                [image] => 33
+                [temp] => 19
+                [date] => Mon, 12 Apr 2010 8:00 pm SAST
             )
     
         [lat] => -33.97
         [long] => 18.6
-        [forecasts] => Array
+        [forecasts] => stdClass Object
             (
-                [0] => Array
+                [0] => stdClass Object
                     (
                         [day] => Mon
                         [date] => 12 Apr 2010
@@ -93,7 +93,7 @@ Output
                         [code] => 31
                     )
     
-                [1] => Array
+                [1] => stdClass Object
                     (
                         [day] => Tue
                         [date] => 13 Apr 2010
