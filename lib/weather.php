@@ -272,19 +272,14 @@ class Weather
     /**
      * Weather::get_url()
      * 
-     * This method issues a cURL request to a specified URL.
+     * This method issues a request to a specified URL.
      * 
-     * @param mixed $url URL to fetch using cURL.
+     * @param mixed $url URL to fetch.
      * @return string Response text.
      */
     protected function get_url($url)
     {
-    	$curl = curl_init($url);
-    	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        
-    	$response = curl_exec($curl);	
-        	
-    	curl_close($curl);    	
+    	$response = file_get_contents($url);	
         return $response;
     }
 }
